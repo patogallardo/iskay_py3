@@ -20,6 +20,8 @@ from iskay import cosmology
 import os
 import sys
 
+print("Num threads: %s" %os.environ['OMP_NUM_THREADS'])
+print("Test line")
 
 def howManyEntries():
     '''Opens the catalog pointed to in params.ini and returns its length

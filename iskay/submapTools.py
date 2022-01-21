@@ -5,6 +5,7 @@ from pixell import enmap
 from pixell import reproject
 import progressbar
 from iskay import cosmology
+from pixell import utils
 
 
 #  This was added on 20210403 during peer review
@@ -132,13 +133,14 @@ def get_aperturePhotometry(submap, ra_deg, dec_deg,
                                              10*np.array(submap.shape))
     if reprojection:
         try:
-            submapForPhotometry = reproject.postage_stamp(submapForPhotometry,
-                                                          ra_deg, dec_deg,
-                                                          3.0*r_ring_arcmin,
-                                                          0.5/10.)[0, :, :]
-        except:  # noqa
+            submapForPhotometry = reproject.thumbnails(submapForPhotometry,
+            [dec_deg*utils.degree, ra_deg*utils.degree],
+            r=3.0 * r_ring_arcmin * utils.arcmin)  # noqa
+        except ValueError:
             T_disk, T_ring = np.nan, np.nan
             return 0, 0
+        except:
+            print("something went wrong, sorry!")
     r_arcmin = 60. * np.rad2deg(submapForPhotometry.modrmap())
     sel_disk = r_arcmin < r_disk_arcmin
     sel_ring = np.logical_and(r_arcmin > r_disk_arcmin,
